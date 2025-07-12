@@ -17,6 +17,6 @@ type SalesReport struct {
 	FileUrl      string    `db:"file_url"`
 	Status       Status    `db:"status"`
 	ErrorMessage string    `db:"error_message"`
-	StartAt      string    `db:"start_at"`
+	StartAt      time.Time `db:"start_at"`
 	CompletedAt  time.Time `db:"completed_at"`
 }
