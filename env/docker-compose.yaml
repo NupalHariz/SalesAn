@@ -1,25 +1,24 @@
-name: boiler-plate-local
+name: salesan
 services:
-  mysql:
+  postgres:
     # use this for mac
     platform: linux/amd64
-    image: mysql:8.0.26
+    image: postgres:latest
 
     # use this for linux
     # platform: linux/x86_64
-    # image: mysql:8.0.26
+    # image: postgres:latest
 
     # ======================= #
     restart: on-failure
     ports:
-      - "3306:3306"
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+      - "5432:5432"
     volumes:
-      - "./storage/mysql/scripts:/docker-entrypoint-initdb.d"
-      - "./storage/mysql/data:/var/lib/mysql"
+      - "./storage/postgres/data:/var/lib/postgresql/data"
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_TCP_PORT: 3306
+      POSTGRES_PASSWORD: password
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: salesan
 
   redis:
     image: redis:6

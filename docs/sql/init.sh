@@ -2,20 +2,20 @@
 
 set -euxo pipefail
 
-HOST="${MYSQL_HOST:-127.0.0.1}"
-PORT="${MYSQL_PORT:-3306}"
-DB_NAME="${MYSQL_DB:-boiler_plate_db}"
-USERNAME="${MYSQL_USER:-root}"
-PASSWORD="${MYSQL_PASSWORD:-password}"
-PROTOCOL="${MYSQL_PROTOCOL:-tcp}"
+HOST="${POSTGRES_HOST:-127.0.0.1}"
+PORT="${POSTGRES_PORT:-5432}"
+DB_NAME="${POSTGRES_DB:-salesan}"
+USERNAME="${POSTGRES_USER:-postgres}"
+PASSWORD="${POSTGRES_PASSWORD:-password}"
+PROTOCOL="${POSTGRES_PROTOCOL:-tcp}"
 
 rm temp.sql || true
-echo "DROP DATABASE IF EXISTS ${DB_NAME};\n" >> temp.sql
-echo "CREATE DATABASE IF NOT EXISTS ${DB_NAME};\n" >> temp.sql
-echo "USE ${DB_NAME};\n" >> temp.sql
-echo "SET foreign_key_checks = 0;\n" >> temp.sql
+echo "DROP DATABASE IF EXISTS ${DB_NAME};" >> temp.sql
+echo "CREATE DATABASE ${DB_NAME};" >> temp.sql
+echo "\\c ${DB_NAME}" >> temp.sql
+echo "SET session_replication_role = 'replica';" >> temp.sql
 cat **/[!temp]*.sql >> temp.sql || true
-echo "SET foreign_key_checks = 1;\n"
+echo "SET session_replication_role = 'origin';" >> temp.sql
 
-mysql -h ${HOST} -P ${PORT} -u ${USERNAME} --password=${PASSWORD} --protocol=${PROTOCOL} < temp.sql
+PGPASSWORD=${PASSWORD} psql -h ${HOST} -p ${PORT} -U ${USERNAME} -d ${DB_NAME} -f temp.sql
 rm temp.sql
