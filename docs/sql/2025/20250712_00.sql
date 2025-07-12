@@ -5,7 +5,7 @@ CREATE TYPE sales_report_status AS ENUM('WAITING', 'PROCESSING', 'DONE', 'FAILED
 DROP TABLE IF EXISTS sales_reports;
 
 CREATE TABLE IF NOT EXISTS sales_reports(
-    id SERIAL PRIMARY KEY AUTO_INCREMENT,
+    id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     file_url VARCHAR(255) NOT NULL,
     status sales_report_status DEFAULT('WAITING'),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS sales_reports(
 DROP TABLE IF EXISTS sales_sumarries;
 
 CREATE TABLE IF NOT EXISTS sales_sumarries(
-    id SERIAL PRIMARY KEY AUTO_INCREMENT,
+    id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
     total_transaction INT NOT NULL,
     success INT NOT NULL, 
@@ -29,15 +29,17 @@ CREATE TABLE IF NOT EXISTS sales_sumarries(
 DROP TABLE IF EXISTS product_sumarries;
 
 CREATE TABLE IF NOT EXISTS product_sumarries(
-    id SERIAL PRIMARY KEY AUTO_INCREMENT,
+    id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
     revenue INT NOT NULL
 );
 
-DROP TABLE IF EXISTS daily_sales_summaries(
-    id SERIAL PRIMARY KEY AUTO_INCREMENT,
+DROP TABLE IF EXISTS daily_sales_summaries;
+
+CREATE TABLE IF NOT EXISTS daily_sales_summaries(
+    id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
     date DATE NOT NULL,
     total_transaction INT NOT NULL,
