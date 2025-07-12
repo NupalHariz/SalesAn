@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS sales_reports(
     error_message VARCHAR(255)
 );
 
-DROP TABLE IF EXISTS sales_sumarries;
+DROP TABLE IF EXISTS sales_summaries;
 
-CREATE TABLE IF NOT EXISTS sales_sumarries(
+CREATE TABLE IF NOT EXISTS sales_summaries(
     id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
     total_transaction INT NOT NULL,
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS sales_sumarries(
     most_payment_method VARCHAR(255) NOT NULL
 );
 
-DROP TABLE IF EXISTS product_sumarries;
+DROP TABLE IF EXISTS product_summaries;
 
-CREATE TABLE IF NOT EXISTS product_sumarries(
+CREATE TABLE IF NOT EXISTS product_summaries(
     id SERIAL PRIMARY KEY,
     report_id INT NOT NULL,
     product_name VARCHAR(255) NOT NULL,
