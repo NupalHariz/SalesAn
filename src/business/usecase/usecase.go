@@ -1,12 +1,12 @@
 package usecase
 
 import (
-	"github.com/reyhanmichiels/go-pkg/auth"
-	"github.com/reyhanmichiels/go-pkg/hash"
-	"github.com/reyhanmichiels/go-pkg/log"
-	"github.com/reyhanmichiels/go-pkg/parser"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/src/business/domain"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/src/business/usecase/user"
+	"github.com/NupalHariz/SalesAn/src/business/domain"
+	"github.com/NupalHariz/SalesAn/src/business/usecase/user"
+	"github.com/reyhanmichiels/go-pkg/v2/auth"
+	"github.com/reyhanmichiels/go-pkg/v2/hash"
+	"github.com/reyhanmichiels/go-pkg/v2/log"
+	"github.com/reyhanmichiels/go-pkg/v2/parser"
 )
 
 type Usecases struct {

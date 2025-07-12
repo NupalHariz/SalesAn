@@ -3,8 +3,8 @@ package rest
 import (
 	"fmt"
 
+	"github.com/NupalHariz/SalesAn/docs/swagger"
 	"github.com/gin-gonic/gin"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/docs/swagger"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

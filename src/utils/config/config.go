@@ -3,13 +3,13 @@ package config
 import (
 	"time"
 
-	"github.com/reyhanmichiels/go-pkg/auth"
-	"github.com/reyhanmichiels/go-pkg/log"
-	"github.com/reyhanmichiels/go-pkg/parser"
-	"github.com/reyhanmichiels/go-pkg/rate_limiter"
-	"github.com/reyhanmichiels/go-pkg/redis"
-	"github.com/reyhanmichiels/go-pkg/sql"
-	"github.com/reyhanmichiels/go-pkg/translator"
+	"github.com/reyhanmichiels/go-pkg/v2/auth"
+	"github.com/reyhanmichiels/go-pkg/v2/log"
+	"github.com/reyhanmichiels/go-pkg/v2/parser"
+	"github.com/reyhanmichiels/go-pkg/v2/rate_limiter"
+	"github.com/reyhanmichiels/go-pkg/v2/redis"
+	"github.com/reyhanmichiels/go-pkg/v2/sql"
+	"github.com/reyhanmichiels/go-pkg/v2/translator"
 )
 
 type Application struct {

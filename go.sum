@@ -131,8 +131,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/redis/go-redis/v9 v9.5.3 h1:fOAp1/uJG+ZtcITgZOfYFmTKPE7n4Vclj1wZFgRciUU=
 github.com/redis/go-redis/v9 v9.5.3/go.mod h1:hdY0cQFCN4fnSYT6TkisLufl/4W5UIXyv0b/CLO2V2M=
-github.com/reyhanmichiels/go-pkg v1.11.0 h1:i6MvW7tcFcZ15GHjTP/P/Xa2Lk2ufSKg5hg7f7Z5NXE=
-github.com/reyhanmichiels/go-pkg v1.11.0/go.mod h1:rVlvdu22/XBep4R+PnERl7imHOzvgpoH7Ei5HYkXiKY=
+github.com/reyhanmichiels/go-pkg/v2 v2.2.0 h1:DS0gau6gW/WsmwgBj+QZwrrNyXABfRddvTSAQtQ6ayA=
+github.com/reyhanmichiels/go-pkg/v2 v2.2.0/go.mod h1:1K6wmRnpTceqkAfCy2/iY3VCsSecYFuTs487HRLNC98=
 github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZVejAe8=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/sagikazarmark/locafero v0.4.0 h1:HApY1R9zGo4DBgr7dqsTH/JJxLTTsOt7u6keLGt6kNQ=

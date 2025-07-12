@@ -3,9 +3,9 @@ package rest
 import (
 	"net/http"
 
+	"github.com/NupalHariz/SalesAn/src/business/entity"
 	"github.com/gin-gonic/gin"
-	"github.com/reyhanmichiels/go-pkg/codes"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/src/business/entity"
+	"github.com/reyhanmichiels/go-pkg/v2/codes"
 )
 
 // @Summary Register

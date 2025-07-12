@@ -9,14 +9,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NupalHariz/SalesAn/src/business/entity"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/reyhanmichiels/go-pkg/appcontext"
-	"github.com/reyhanmichiels/go-pkg/codes"
-	"github.com/reyhanmichiels/go-pkg/errors"
-	"github.com/reyhanmichiels/go-pkg/header"
-	"github.com/reyhanmichiels/go-pkg/query"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/src/business/entity"
+	"github.com/reyhanmichiels/go-pkg/v2/appcontext"
+	"github.com/reyhanmichiels/go-pkg/v2/codes"
+	"github.com/reyhanmichiels/go-pkg/v2/errors"
+	"github.com/reyhanmichiels/go-pkg/v2/header"
+	"github.com/reyhanmichiels/go-pkg/v2/query"
 )
 
 const (

@@ -1,9 +1,9 @@
 package entity
 
 import (
-	"github.com/reyhanmichiels/go-pkg/auth"
-	"github.com/reyhanmichiels/go-pkg/null"
-	"github.com/reyhanmichiels/go-pkg/query"
+	"github.com/reyhanmichiels/go-pkg/v2/auth"
+	"github.com/reyhanmichiels/go-pkg/v2/null"
+	"github.com/reyhanmichiels/go-pkg/v2/query"
 )
 
 type User struct {

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/reyhanmichiels/go-pkg/codes"
-	"github.com/reyhanmichiels/go-pkg/errors"
-	"github.com/reyhanmichiels/go-pkg/query"
-	"github.com/reyhanmichiels/go-pkg/sql"
-	"github.com/reyhanmichies/go-rest-api-boiler-plate/src/business/entity"
+	"github.com/NupalHariz/SalesAn/src/business/entity"
+	"github.com/reyhanmichiels/go-pkg/v2/codes"
+	"github.com/reyhanmichiels/go-pkg/v2/errors"
+	"github.com/reyhanmichiels/go-pkg/v2/query"
+	"github.com/reyhanmichiels/go-pkg/v2/sql"
 )
 
 func (u *user) createSQL(ctx context.Context, inputParam entity.UserInputParam) (entity.User, error) {
@@ -67,7 +67,7 @@ func (u *user) getSQL(ctx context.Context, param entity.UserParam) (entity.User,
 	u.log.Debug(ctx, fmt.Sprintf("get user with body: %v", param))
 
 	param.QueryOption.DisableLimit = true
-	qb := query.NewSQLQueryBuilder("param", "db", &param.QueryOption)
+	qb := query.NewSQLQueryBuilder(u.db, "param", "db", &param.QueryOption)
 	queryExt, queryArgs, _, _, err := qb.Build(&param)
 	if err != nil {
 		return user, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
@@ -94,7 +94,7 @@ func (u *user) getListSQL(ctx context.Context, param entity.UserParam) ([]entity
 
 	u.log.Debug(ctx, fmt.Sprintf("get user list with body: %v", param))
 
-	qb := query.NewSQLQueryBuilder("param", "db", &param.QueryOption)
+	qb := query.NewSQLQueryBuilder(u.db , "param", "db", &param.QueryOption)
 	queryExt, queryArgs, countExt, countArgs, err := qb.Build(&param)
 	if err != nil {
 		return users, nil, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
@@ -140,7 +140,7 @@ func (u *user) getListSQL(ctx context.Context, param entity.UserParam) ([]entity
 func (u *user) updateSQL(ctx context.Context, updateParam entity.UserUpdateParam, selectParam entity.UserParam) error {
 	u.log.Debug(ctx, fmt.Sprintf("update user %v with body: %v", selectParam.ID, updateParam))
 
-	qb := query.NewSQLQueryBuilder("param", "db", &selectParam.QueryOption)
+	qb := query.NewSQLQueryBuilder(u.db, "param", "db", &selectParam.QueryOption)
 	queryUpdate, args, err := qb.BuildUpdate(&updateParam, &selectParam)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
