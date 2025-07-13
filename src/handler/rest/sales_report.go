@@ -22,3 +22,13 @@ func (r *rest) UploadReport(ctx *gin.Context) {
 
 	r.httpRespSuccess(ctx, codes.CodeAccepted, data, nil)
 }
+
+func (r *rest) GetReportList(ctx *gin.Context) {
+	data, err := r.uc.SalesReport.ListReport(ctx.Request.Context())
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, data, nil)
+}

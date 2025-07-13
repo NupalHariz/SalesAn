@@ -133,6 +133,7 @@ func (r *rest) Register() {
 	v1 := r.http.Group("/v1/", commonPrivateMiddlewares...)
 
 	v1.POST("/sales-reports/", r.UploadReport)
+	v1.GET("/sales-reports/", r.GetReportList)
 }
 
 func (r *rest) Run() {

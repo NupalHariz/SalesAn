@@ -1,14 +1,9 @@
-DROP TYPE IF EXISTS sales_report_status;
-
-CREATE TYPE sales_report_status AS ENUM('WAITING', 'PROCESSING', 'DONE', 'FAILED');
-
 DROP TABLE IF EXISTS sales_reports;
 
 CREATE TABLE IF NOT EXISTS sales_reports(
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     file_url VARCHAR(255) NOT NULL,
-    status sales_report_status DEFAULT('WAITING'),
     start_at TIMESTAMP,
     completed_at TIMESTAMP,
     error_message VARCHAR(255)

@@ -39,3 +39,30 @@ func (s *salesReport) createSQL(ctx context.Context, param entity.SalesReport) e
 
 	return nil
 }
+
+func (s *salesReport) getListSQL(ctx context.Context) ([]entity.SalesReport, error) {
+	var salesReports []entity.SalesReport
+
+	s.log.Debug(ctx, "get all report list")
+
+	rows, err := s.db.Query(ctx, "raSalesReport", readSalesReportList)
+	if err != nil {
+		return salesReports, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var salesReport entity.SalesReport
+
+		err := rows.StructScan(&salesReport)
+		if err != nil {
+			return salesReports, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
+		}
+
+		salesReports = append(salesReports, salesReport)
+	}
+
+	s.log.Debug(ctx, "success to get sales report list")
+
+	return salesReports, nil
+}
