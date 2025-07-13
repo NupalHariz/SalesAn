@@ -2,7 +2,6 @@ package salesreport
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"mime/multipart"
 	"strconv"
@@ -15,6 +14,8 @@ import (
 	"github.com/NupalHariz/SalesAn/src/business/service/supabase"
 	"github.com/nao1215/csv"
 	"github.com/reyhanmichiels/go-pkg/v2/auth"
+	"github.com/reyhanmichiels/go-pkg/v2/codes"
+	errorPkg "github.com/reyhanmichiels/go-pkg/v2/errors"
 	"github.com/reyhanmichiels/go-pkg/v2/files"
 	"github.com/xuri/excelize/v2"
 )
@@ -57,7 +58,7 @@ func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportPa
 	case "xlam", "xlsm", "xlsx", "xltx", "xltm":
 		valid, err = s.validateExceel(param.Report)
 	default:
-		return "", errors.New("invalid file extension")
+		return "", errorPkg.NewWithCode(codes.CodeBadRequest, "invalid file extension")
 	}
 
 	if !valid {
@@ -100,23 +101,23 @@ func (s *salesReport) validateCSV(param *multipart.FileHeader) (bool, error) {
 		return false, err
 	}
 	report := make([]entity.Report, 0)
-	errorss := r.Decode(&report)
+	validationError := r.Decode(&report)
 
 	for i, r := range report {
 		_, err := time.Parse("2006-01-02", r.Date)
 		if err != nil {
 			msg := fmt.Errorf("line:%d column date: expected format YYYY-MM-DD, got=%s", i, r.Date)
-			errorss = append(errorss, msg)
+			validationError = append(validationError, msg)
 		}
 	}
 
-	if len(errorss) > 0 {
-		errMsg := make([]string, len(errorss))
-		for i, e := range errorss {
+	if len(validationError) > 0 {
+		errMsg := make([]string, len(validationError))
+		for i, e := range validationError {
 			errMsg[i] = e.Error()
 		}
 
-		return false, errors.New(strings.Join(errMsg, ", "))
+		return false, errorPkg.NewWithCode(codes.CodeBadRequest, strings.Join(errMsg, ", "))
 	}
 
 	return true, nil
@@ -136,7 +137,7 @@ func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) 
 
 	sheetName := rFile.GetSheetName(0)
 	if sheetName == "" {
-		return false, errors.New("sheet can't be empty")
+		return false, errorPkg.NewWithCode(codes.CodeBadRequest, "sheet can not be empty")
 	}
 
 	rows, err := rFile.GetRows(sheetName)
@@ -162,7 +163,9 @@ func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) 
 		line := i + 1
 
 		if len(row) < 9 {
-			return false, errors.New("there should be 9 column")
+			return false, errorPkg.NewWithCode(codes.CodeBadRequest,
+				"There must be at least 9 columns: InvoiceID, Date, CustomerName, Item, Quantity, UnitPrice, Total, Status, and PaymentMethod.",
+			)
 		}
 
 		emptyCol := make(map[int]bool)
@@ -215,7 +218,7 @@ func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) 
 	}
 
 	if len(validationError) > 0 {
-		return false, errors.New(strings.Join(validationError, ", "))
+		return false, errorPkg.NewWithCode(codes.CodeBadRequest, strings.Join(validationError, ", "))
 	}
 
 	return true, nil
