@@ -25,7 +25,7 @@ type Interface interface {
 }
 
 type salesReport struct {
-	salesRepostDom salesreportDom.Interface
+	salesReportDom salesreportDom.Interface
 	auth           auth.Interface
 	supabase       supabase.Interface
 }
@@ -38,7 +38,7 @@ type InitParam struct {
 
 func Init(param InitParam) Interface {
 	return &salesReport{
-		salesRepostDom: param.SalesReportDom,
+		salesReportDom: param.SalesReportDom,
 		auth:           param.Auth,
 		supabase:       param.Supabase,
 	}
@@ -56,7 +56,7 @@ func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportPa
 	case "csv":
 		valid, err = s.validateCSV(param.Report)
 	case "xlam", "xlsm", "xlsx", "xltx", "xltm":
-		valid, err = s.validateExceel(param.Report)
+		valid, err = s.validateExcel(param.Report)
 	default:
 		return "", errorPkg.NewWithCode(codes.CodeBadRequest, "invalid file extension")
 	}
@@ -81,7 +81,7 @@ func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportPa
 	//SEND TO QUEUE
 	//To Do Later Saja Fokus 3 lainnya dulu -> Get -> Queue
 
-	err = s.salesRepostDom.Create(ctx, salesReport)
+	err = s.salesReportDom.Create(ctx, salesReport)
 	if err != nil {
 		return "", err
 	}
@@ -123,7 +123,7 @@ func (s *salesReport) validateCSV(param *multipart.FileHeader) (bool, error) {
 	return true, nil
 }
 
-func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) {
+func (s *salesReport) validateExcel(param *multipart.FileHeader) (bool, error) {
 	file, err := param.Open()
 	if err != nil {
 		return false, err
@@ -175,7 +175,7 @@ func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) 
 				emptyCol[colID] = true
 
 				validationError = append(validationError, fmt.Sprintf(
-					"line:%d column %s has an empty columny", line, columnNames[colID],
+					"line:%d column %s has an empty column", line, columnNames[colID],
 				))
 			}
 		}
@@ -202,7 +202,7 @@ func (s *salesReport) validateExceel(param *multipart.FileHeader) (bool, error) 
 			unitPrice, uErr := strconv.Atoi(row[5])
 			if uErr != nil || unitPrice < 0 {
 				validationError = append(validationError, fmt.Sprintf(
-					"line:%d column Unit Price: must be numeric and > 0, got = %s", line, row[5],
+					"line:%d column UnitPrice: must be numeric and > 0, got = %s", line, row[5],
 				))
 			}
 		}

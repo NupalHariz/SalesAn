@@ -19,8 +19,6 @@ func (s *salesReport) createSQL(ctx context.Context, param entity.SalesReport) e
 	}
 	defer tx.Rollback()
 
-	fmt.Println("\n\n\n Param: ", param)
-
 	res, err := tx.NamedExec("iNewSalesReport", insertSalesReport, param)
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
