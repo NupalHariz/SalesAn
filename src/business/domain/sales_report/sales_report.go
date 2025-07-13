@@ -10,6 +10,7 @@ import (
 
 type Interface interface {
 	Create(ctx context.Context, param entity.SalesReport) error
+	GetList(ctx context.Context) ([]entity.SalesReport, error)
 }
 
 type salesReport struct {
@@ -36,4 +37,13 @@ func (s *salesReport) Create(ctx context.Context, param entity.SalesReport) erro
 	}
 
 	return nil
+}
+
+func (s *salesReport) GetList(ctx context.Context) ([]entity.SalesReport, error) {
+	salesReports, err := s.getListSQL(ctx)
+	if err != nil {
+		return salesReports, err
+	}
+
+	return salesReports, nil
 }

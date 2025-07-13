@@ -22,6 +22,7 @@ import (
 
 type Interface interface {
 	UploadReport(ctx context.Context, param dto.UploadReportParam) (string, error)
+	ListReport(ctx context.Context) ([]dto.GetReportList, error)
 }
 
 type salesReport struct {
@@ -222,4 +223,38 @@ func (s *salesReport) validateExcel(param *multipart.FileHeader) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (s *salesReport) ListReport(ctx context.Context) ([]dto.GetReportList, error) {
+	var res []dto.GetReportList
+
+	salesReports, err := s.salesReportDom.GetList(ctx)
+	if err != nil {
+		return res, err
+	}
+
+	for _, s := range salesReports {
+		var salesReport dto.GetReportList
+		var status string
+
+		if s.StartAt.IsNullOrZero() {
+			status = "Waiting"
+		} else if !s.StartAt.IsNullOrZero() && s.CompletedAt.IsNullOrZero() {
+			status = "Processing"
+		} else if !s.CompletedAt.IsNullOrZero() && !s.ErrorMessage.IsNullOrZero() {
+			status = "Failed"
+		} else {
+			status = "Success"
+		}
+
+		salesReport = dto.GetReportList{
+			Id:      s.Id,
+			FileUrl: s.FileUrl,
+			Status:  status,
+		}
+
+		res = append(res, salesReport)
+	}
+
+	return res, nil
 }

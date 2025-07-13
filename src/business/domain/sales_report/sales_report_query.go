@@ -12,4 +12,15 @@ const (
 			:file_url
 		)
 	`
+
+	readSalesReportList = `
+		SELECT
+			Id,
+			file_url,
+			error_message,
+			start_at,
+			completed_at
+		FROM
+			sales_reports
+	`
 )
