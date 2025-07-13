@@ -15,7 +15,7 @@ const (
 
 	readSalesReportList = `
 		SELECT
-			Id,
+			id,
 			file_url,
 			error_message,
 			start_at,
