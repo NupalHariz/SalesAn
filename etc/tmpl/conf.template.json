@@ -109,5 +109,10 @@
       "ObjectFieldMustBeSimpleString": false,
       "CasesenSitive": true
     }
+  },
+  "Supabase": {
+    "SupabaseUrl": "{{ SUPABASE_URL }}",
+    "Token": "{{ SUPABASE TOKEN }}",
+    "BucketName": "{{ SUPABASE BUCKET }}"
   }
 }

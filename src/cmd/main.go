@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/NupalHariz/SalesAn/src/business/domain"
+	"github.com/NupalHariz/SalesAn/src/business/service/supabase"
 	"github.com/NupalHariz/SalesAn/src/business/usecase"
 	"github.com/NupalHariz/SalesAn/src/handler/rest"
 	"github.com/NupalHariz/SalesAn/src/utils/config"
@@ -78,8 +79,11 @@ func main() {
 	// auth
 	auth := auth.Init(cfg.Auth, log)
 
+	// supabase
+	supabase := supabase.Init(supabase.InitParam{cfg.Supabase})
+
 	// init usecase
-	uc := usecase.Init(usecase.InitParam{Dom: dom, Log: log, Json: parser.JSONParser(), Hash: hash, Auth: auth})
+	uc := usecase.Init(usecase.InitParam{Dom: dom, Log: log, Json: parser.JSONParser(), Hash: hash, Auth: auth, Supabase: supabase})
 
 	// init http server
 	r := rest.Init(rest.InitParam{Uc: uc, GinConfig: cfg.Gin, Log: log, RateLimiter: rateLimiter, Json: parser.JSONParser(), Auth: auth})

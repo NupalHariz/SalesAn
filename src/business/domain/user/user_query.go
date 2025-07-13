@@ -2,7 +2,7 @@ package user
 
 const (
 	insertUser = `
-		INSERT INTO user
+		INSERT INTO users
 		(
 			fk_role_id,
 		 	name,
@@ -19,7 +19,7 @@ const (
 		 	:password,
 		 	:created_at,
 		 	:created_by
-		)
+		) RETURNING *
 	`
 
 	readUser = `
@@ -39,18 +39,18 @@ const (
 			deleted_at,
 			deleted_by
 		FROM
-			user
+			users
 	`
 
 	countUser = `
 		SELECT
 			COUNT(*)
 		FROM
-			user
+			users
 	`
 
 	updateUser = `
 		UPDATE
-			user
+			users
 	`
 )

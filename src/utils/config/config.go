@@ -22,6 +22,7 @@ type Application struct {
 	Translator  translator.Config
 	RateLimiter rate_limiter.Config
 	Parser      parser.Options
+	Supabase    SupabaseConfig
 }
 
 type ApplicationMeta struct {
@@ -68,6 +69,12 @@ type DummyConfig struct {
 type BasicAuthConf struct {
 	Username string
 	Password string
+}
+
+type SupabaseConfig struct {
+	SupabaseUrl string
+	Token       string
+	BucketName  string
 }
 
 func Init() Application {

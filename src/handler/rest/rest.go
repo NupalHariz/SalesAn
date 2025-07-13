@@ -130,7 +130,9 @@ func (r *rest) Register() {
 	r.http.Group("/public/v1/", commonPublicMiddlewares...)
 
 	// private api
-	r.http.Group("/v1/", commonPrivateMiddlewares...)
+	v1 := r.http.Group("/v1/", commonPrivateMiddlewares...)
+
+	v1.POST("/sales-reports/", r.UploadReport)
 }
 
 func (r *rest) Run() {
