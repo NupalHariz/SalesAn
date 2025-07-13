@@ -23,23 +23,15 @@ func (u *user) createSQL(ctx context.Context, inputParam entity.UserInputParam) 
 	}
 	defer tx.Rollback()
 
-	res, err := tx.NamedExec("iNewUser", insertUser, inputParam)
-	if err != nil && strings.Contains(err.Error(), entity.DuplicateEntryErrMessage) {
-		return user, errors.NewWithCode(codes.CodeSQLUniqueConstraint, err.Error())
-	} else if err != nil {
+	stmt, err := tx.PrepareNamed("iNewUser", insertUser)
+	if err != nil {
+		return user, errors.NewWithCode(codes.CodeSQLPrepareStmt, err.Error())
+	}
+	defer stmt.Close()
+
+	err = stmt.Get(&user, inputParam)
+	if err != nil {
 		return user, errors.NewWithCode(codes.CodeSQLTxExec, err.Error())
-	}
-
-	rowCount, err := res.RowsAffected()
-	if err != nil {
-		return user, errors.NewWithCode(codes.CodeSQLNoRowsAffected, err.Error())
-	} else if rowCount < 1 {
-		return user, errors.NewWithCode(codes.CodeSQLNoRowsAffected, "no user created")
-	}
-
-	lastID, err := res.LastInsertId()
-	if err != nil {
-		return user, errors.NewWithCode(codes.CodeSQLNoRowsAffected, err.Error())
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -47,16 +39,6 @@ func (u *user) createSQL(ctx context.Context, inputParam entity.UserInputParam) 
 	}
 
 	u.log.Debug(ctx, fmt.Sprintf("success create user with body: %v", inputParam))
-
-	user = entity.User{
-		ID:        lastID,
-		RoleID:    inputParam.RoleID,
-		Name:      inputParam.Name,
-		Email:     inputParam.Email,
-		Status:    1,
-		CreatedAt: inputParam.CreatedAt,
-		CreatedBy: inputParam.CreatedBy,
-	}
 
 	return user, nil
 }
