@@ -84,12 +84,12 @@
       "InsecureSkipVerify": "{{ REDIS_TLS_INSECURE_SKIP_VERIFY }}"
     }
   },
-  "Translator":{
+  "Translator": {
     "FallbackLanguageID": "en",
     "SupportedLanguageIDs": ["id"],
     "TranslationDir": "./docs/translation"
   },
-  "RateLimiter":{
+  "RateLimiter": {
     "Enabled": "{{ RATE_LIMITER_ENABLED }}",
     "Period": "{{ RATE_LIMITER_PERIOD }}",
     "Limit": "{{ RATE_LIMITER_LIMIT }}"
@@ -114,5 +114,15 @@
     "SupabaseUrl": "{{ SUPABASE_URL }}",
     "Token": "{{ SUPABASE TOKEN }}",
     "BucketName": "{{ SUPABASE BUCKET }}"
+  },
+  "RabbitMQ": {
+    "Host": "{{ RABBITMQ_HOST }}",
+    "Port": "{{ RABBITMQ_PORT }}",
+    "Username": "{{ RABBITMQ_USERNAME }}",
+    "Password": "{{ RABBITMQ_PASSWORD }}",
+    "SSL": "{{ RABBITMQ_SSL }}",
+    "Options": {
+      "ReconnectDelay": "{{ RABBITMQ_RECONNECT_DELAY }}"
+    }
   }
 }

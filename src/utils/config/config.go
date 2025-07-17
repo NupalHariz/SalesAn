@@ -23,6 +23,7 @@ type Application struct {
 	RateLimiter rate_limiter.Config
 	Parser      parser.Options
 	Supabase    SupabaseConfig
+	RabbitMQ    RabbitMQConfig
 }
 
 type ApplicationMeta struct {
@@ -75,6 +76,13 @@ type SupabaseConfig struct {
 	SupabaseUrl string
 	Token       string
 	BucketName  string
+}
+
+type RabbitMQConfig struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
 }
 
 func Init() Application {
