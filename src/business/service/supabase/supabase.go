@@ -9,6 +9,7 @@ import (
 
 type Interface interface {
 	Upload(file *multipart.FileHeader) (string, error)
+	Get(url string) 
 }
 
 type supabase struct {
@@ -32,4 +33,8 @@ func (s *supabase) Upload(file *multipart.FileHeader) (string, error) {
 	url, err := s.client.Upload(file)
 
 	return url, err
+}
+
+func (s *supabase) Get(url string) {
+	
 }

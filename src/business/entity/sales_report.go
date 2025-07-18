@@ -14,3 +14,13 @@ type SalesReport struct {
 	StartAt      null.Time   `db:"start_at"`
 	CompletedAt  null.Time   `db:"completed_at"`
 }
+
+type SalesReportParam struct {
+	FileUrl string `db:"file_url"`
+}
+
+type SalesReportUpdateParam struct {
+	ErrorMessage null.String `db:"error_message"`
+	StartAt      null.Time   `db:"start_at"`
+	CompletedAt  null.Time   `db:"completed_at"`
+}

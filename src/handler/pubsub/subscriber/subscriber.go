@@ -87,6 +87,7 @@ func (s *subsriber) InitSubscription() {
 
 func (s *subsriber) assignEvent() {
 	s.callsFuncMap = map[string]callFunc{
+		fmt.Sprintf("%s:%s", entity.QueueSalesReport, entity.KeySalesReport): s.uc.SalesReport.SummarizeReport,
 	}
 }
 

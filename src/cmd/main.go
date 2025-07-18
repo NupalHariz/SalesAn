@@ -91,7 +91,9 @@ func main() {
 	uc := usecase.Init(usecase.InitParam{Dom: dom, Log: log, Json: parser.JSONParser(), Hash: hash, Auth: auth, Supabase: supabase, Publisher: publisher})
 
 	//subscriber
-	_ = subscriber.Init(subscriber.InitParam{Cfg: cfg.RabbitMQ, Log: log, Json: parser.JSONParser(), UC: *uc})
+	subscriber := subscriber.Init(subscriber.InitParam{Cfg: cfg.RabbitMQ, Log: log, Json: parser.JSONParser(), UC: *uc})
+
+	subscriber.InitSubscription()
 
 	// init http server
 	r := rest.Init(rest.InitParam{Uc: uc, GinConfig: cfg.Gin, Log: log, RateLimiter: rateLimiter, Json: parser.JSONParser(), Auth: auth})
