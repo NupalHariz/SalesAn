@@ -84,7 +84,7 @@ func main() {
 	// supabase
 	supabase := supabase.Init(supabase.InitParam{cfg.Supabase})
 
-	//publsiher
+	//publisher
 	publisher := publisher.Init(publisher.InitParam{Cfg: cfg.RabbitMQ, Log: log, Json: parser.JSONParser()})
 
 	// init usecase

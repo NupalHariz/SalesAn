@@ -11,7 +11,7 @@ import (
 )
 
 func (s *salesSummary) createSQL(ctx context.Context, param entity.SalesSummary) error {
-	s.log.Info(ctx, fmt.Sprintf("insert to sales_sumarries with param: %v", param))
+	s.log.Info(ctx, fmt.Sprintf("insert to sales_summaries with param: %v", param))
 
 	tx, err := s.db.Leader().BeginTx(ctx, "txSalesSummary", sql.TxOptions{})
 	if err != nil {

@@ -1,7 +1,7 @@
 package dailysalessummary
 
 const (
-	insertDailySalesSummary=`
+	insertDailySalesSummary = `
 		INSERT INTO
 			daily_sales_summaries(
 				report_id,

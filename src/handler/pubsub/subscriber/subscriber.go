@@ -21,7 +21,7 @@ type Interface interface {
 	InitSubscription()
 }
 
-type subsriber struct {
+type subscriber struct {
 	pbsb         *amqp091.Connection
 	cfg          config.RabbitMQConfig
 	log          log.Interface
@@ -51,7 +51,7 @@ func Init(param InitParam) Interface {
 		param.Log.Fatal(context.Background(), fmt.Sprintf("failed to create connection, err: %s", err))
 	}
 
-	subsriber := &subsriber{
+	subscriber := &subscriber{
 		pbsb: conn,
 		log:  param.Log,
 		json: param.Json,
@@ -59,9 +59,9 @@ func Init(param InitParam) Interface {
 		cfg:  param.Cfg,
 	}
 
-	subsriber.assignEvent()
+	subscriber.assignEvent()
 
-	notifyClose := subsriber.pbsb.NotifyClose(make(chan *amqp091.Error))
+	notifyClose := subscriber.pbsb.NotifyClose(make(chan *amqp091.Error))
 	go func() {
 		err := <-notifyClose
 		if err != nil {
@@ -71,10 +71,10 @@ func Init(param InitParam) Interface {
 
 	param.Log.Info(context.Background(), fmt.Sprintf("success to create subscriber rabbit mq connection, conn: %s", connAddr))
 
-	return subsriber
+	return subscriber
 }
 
-func (s *subsriber) InitSubscription() {
+func (s *subscriber) InitSubscription() {
 	go func() {
 		for _, q := range setUpQueues {
 			err := s.subscribe(context.Background(), q)
@@ -85,13 +85,13 @@ func (s *subsriber) InitSubscription() {
 	}()
 }
 
-func (s *subsriber) assignEvent() {
+func (s *subscriber) assignEvent() {
 	s.callsFuncMap = map[string]callFunc{
 		fmt.Sprintf("%s:%s", entity.QueueSalesReport, entity.KeySalesReport): s.uc.SalesReport.SummarizeReport,
 	}
 }
 
-func (s *subsriber) addFieldsToContext(ctx context.Context, eventName string) context.Context {
+func (s *subscriber) addFieldsToContext(ctx context.Context, eventName string) context.Context {
 	ctx = appcontext.SetRequestId(ctx, uuid.NewString())
 	ctx = appcontext.SetUserAgent(ctx, eventName)
 	ctx = appcontext.SetRequestStartTime(ctx, time.Now())
@@ -99,7 +99,7 @@ func (s *subsriber) addFieldsToContext(ctx context.Context, eventName string) co
 	return ctx
 }
 
-func (s *subsriber) subscribe(ctx context.Context, param setUpQueue) error {
+func (s *subscriber) subscribe(ctx context.Context, param setUpQueue) error {
 	eventName := fmt.Sprintf("%s:%s", param.QueueName, param.RoutingKey)
 	ctx = s.addFieldsToContext(ctx, eventName)
 
@@ -163,7 +163,7 @@ func (s *subsriber) subscribe(ctx context.Context, param setUpQueue) error {
 			var data entity.PubSubMessage
 			err = s.json.Unmarshal(delivery.Body, &data)
 			if err != nil {
-				s.log.Error(ctx, fmt.Sprintf("error unmarshall: %v", err))
+				s.log.Error(ctx, fmt.Sprintf("error unmarshal: %v", err))
 				continue
 			}
 

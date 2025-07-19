@@ -282,8 +282,6 @@ func (s *salesReport) ListReport(ctx context.Context) ([]dto.GetReportList, erro
 		res = append(res, salesReport)
 	}
 
-	_ = s.publisher.Publish(ctx, entity.ExchangeSalesReport, entity.KeyHi, "Naufal Haris, KING OF THE KINGS")
-
 	return res, nil
 }
 

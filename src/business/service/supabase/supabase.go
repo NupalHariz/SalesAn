@@ -9,7 +9,6 @@ import (
 
 type Interface interface {
 	Upload(file *multipart.FileHeader) (string, error)
-	Get(url string) 
 }
 
 type supabase struct {

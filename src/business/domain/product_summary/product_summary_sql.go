@@ -11,8 +11,8 @@ import (
 )
 
 func (p *productSummary) createSQL(ctx context.Context, param []entity.ProductSummary) error {
-	p.log.Info(ctx, fmt.Sprintf("insert to sales_sumarries with param: %v", param))
-	
+	p.log.Info(ctx, fmt.Sprintf("insert to product_summaries with param: %v", param))
+
 	tx, err := p.db.Leader().BeginTx(ctx, "txProductSummary", sql.TxOptions{})
 	if err != nil {
 		return errors.NewWithCode(codes.CodeSQLTxBegin, err.Error())
