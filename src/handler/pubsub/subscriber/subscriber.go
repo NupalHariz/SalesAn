@@ -106,6 +106,7 @@ func (s *subscriber) subscribe(ctx context.Context, param setUpQueue) error {
 	ch, err := s.pbsb.Channel()
 	if err != nil {
 		s.log.Error(ctx, fmt.Sprintf("failed to open channel, err: %s", err))
+		return err
 	}
 	notifyClose := ch.NotifyClose(make(chan *amqp091.Error))
 

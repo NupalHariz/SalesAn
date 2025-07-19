@@ -434,7 +434,7 @@ func (s *salesReport) SummarizeReport(ctx context.Context, payload entity.PubSub
 		entity.SalesReportUpdateParam{CompletedAt: null.TimeFrom(time.Now())},
 		entity.SalesReportParam{FileUrl: salesReport.FileUrl},
 	)
-	
+
 	if err != nil {
 		return err
 	}
