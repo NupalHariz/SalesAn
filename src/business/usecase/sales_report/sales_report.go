@@ -78,13 +78,10 @@ const (
 )
 
 func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportParam) (string, error) {
-	userLogin, err := s.auth.GetUserAuthInfo(ctx)
-	if err != nil {
-		return "", err
-	}
 	fileExt := files.GetExtension(param.Report.Filename)
 
 	var valid bool
+	var err error
 	switch strings.ToLower(fileExt) {
 	case "csv":
 		valid, err = s.validateCSV(param.Report)
@@ -107,7 +104,6 @@ func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportPa
 	}
 
 	salesReport := entity.SalesReport{
-		UserId:  userLogin.ID,
 		FileUrl: url,
 	}
 
