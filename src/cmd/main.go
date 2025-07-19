@@ -7,6 +7,8 @@ import (
 	"github.com/NupalHariz/SalesAn/src/business/domain"
 	"github.com/NupalHariz/SalesAn/src/business/service/supabase"
 	"github.com/NupalHariz/SalesAn/src/business/usecase"
+	"github.com/NupalHariz/SalesAn/src/handler/pubsub/publisher"
+	"github.com/NupalHariz/SalesAn/src/handler/pubsub/subscriber"
 	"github.com/NupalHariz/SalesAn/src/handler/rest"
 	"github.com/NupalHariz/SalesAn/src/utils/config"
 	"github.com/reyhanmichiels/go-pkg/v2/auth"
@@ -82,8 +84,16 @@ func main() {
 	// supabase
 	supabase := supabase.Init(supabase.InitParam{cfg.Supabase})
 
+	//publisher
+	publisher := publisher.Init(publisher.InitParam{Cfg: cfg.RabbitMQ, Log: log, Json: parser.JSONParser()})
+
 	// init usecase
-	uc := usecase.Init(usecase.InitParam{Dom: dom, Log: log, Json: parser.JSONParser(), Hash: hash, Auth: auth, Supabase: supabase})
+	uc := usecase.Init(usecase.InitParam{Dom: dom, Log: log, Json: parser.JSONParser(), Hash: hash, Auth: auth, Supabase: supabase, Publisher: publisher})
+
+	//subscriber
+	subscriber := subscriber.Init(subscriber.InitParam{Cfg: cfg.RabbitMQ, Log: log, Json: parser.JSONParser(), UC: *uc})
+
+	subscriber.InitSubscription()
 
 	// init http server
 	r := rest.Init(rest.InitParam{Uc: uc, GinConfig: cfg.Gin, Log: log, RateLimiter: rateLimiter, Json: parser.JSONParser(), Auth: auth})

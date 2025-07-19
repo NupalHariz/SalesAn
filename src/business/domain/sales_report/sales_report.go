@@ -9,8 +9,9 @@ import (
 )
 
 type Interface interface {
-	Create(ctx context.Context, param entity.SalesReport) error
+	Create(ctx context.Context, param entity.SalesReport) (entity.SalesReport, error)
 	GetList(ctx context.Context) ([]entity.SalesReport, error)
+	Update(ctx context.Context, updateParam entity.SalesReportUpdateParam, saleReportParam entity.SalesReportParam) error
 }
 
 type salesReport struct {
@@ -30,13 +31,13 @@ func Init(param InitParam) Interface {
 	}
 }
 
-func (s *salesReport) Create(ctx context.Context, param entity.SalesReport) error {
-	err := s.createSQL(ctx, param)
+func (s *salesReport) Create(ctx context.Context, param entity.SalesReport) (entity.SalesReport, error) {
+	salesReport, err := s.createSQL(ctx, param)
 	if err != nil {
-		return err
+		return salesReport, err
 	}
 
-	return nil
+	return salesReport, nil
 }
 
 func (s *salesReport) GetList(ctx context.Context) ([]entity.SalesReport, error) {
@@ -46,4 +47,13 @@ func (s *salesReport) GetList(ctx context.Context) ([]entity.SalesReport, error)
 	}
 
 	return salesReports, nil
+}
+
+func (s *salesReport) Update(ctx context.Context, updateParam entity.SalesReportUpdateParam, saleReportParam entity.SalesReportParam) error {
+	err := s.updateSQL(ctx, updateParam, saleReportParam)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

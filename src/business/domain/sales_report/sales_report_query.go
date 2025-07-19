@@ -10,7 +10,7 @@ const (
 		VALUES(
 			:user_id,
 			:file_url
-		)
+		) RETURNING *
 	`
 
 	readSalesReportList = `
@@ -21,6 +21,11 @@ const (
 			start_at,
 			completed_at
 		FROM
+			sales_reports
+	`
+
+	updateSalesReport = `
+		UPDATE
 			sales_reports
 	`
 )
