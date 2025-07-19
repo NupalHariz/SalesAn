@@ -46,7 +46,7 @@ This is a fun project i used to learn about asynchronous programming and RabbitM
 ### Prerequisites
 
 - Go 1.23+
-- Docker (for running RabbitMQ, PostgreSQL, and Redis)
+- Docker (for running RabbitMQ and PostgreSQL)
 
 ### Set Up Project
 
