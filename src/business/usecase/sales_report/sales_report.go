@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	dailySalesSummaryDom "github.com/NupalHariz/SalesAn/src/business/domain/daily_sales_summary"
@@ -288,18 +289,20 @@ func (s *salesReport) ListReport(ctx context.Context) ([]dto.GetReportList, erro
 
 func (s *salesReport) SummarizeReport(ctx context.Context, payload entity.PubSubMessage) error {
 	var salesReport entity.SalesReport
-	err := s.json.Unmarshal([]byte(payload.Payload), &salesReport)
+	var err error
+	err = s.json.Unmarshal([]byte(payload.Payload), &salesReport)
 	if err != nil {
 		return err
 	}
 
-	now := null.TimeFrom(time.Now())
-
 	err = s.salesReportDom.Update(
 		ctx,
-		entity.SalesReportUpdateParam{StartAt: now},
+		entity.SalesReportUpdateParam{StartAt: null.TimeFrom(time.Now())},
 		entity.SalesReportParam{FileUrl: salesReport.FileUrl},
 	)
+	if err != nil {
+		return err
+	}
 
 	resp, err := http.Get(salesReport.FileUrl)
 	if err != nil {
@@ -311,46 +314,133 @@ func (s *salesReport) SummarizeReport(ctx context.Context, payload entity.PubSub
 		return err
 	}
 
-	reader, err := csv.NewCSV(resp.Body)
-	if err != nil {
-		return err
+	var reports []entity.Report
+
+	fileExt := files.GetExtension(salesReport.FileUrl)
+
+	switch fileExt {
+	case "csv":
+		reader, err := csv.NewCSV(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		reports = make([]entity.Report, 0)
+		errs := reader.Decode(&reports)
+		if len(errs) > 0 {
+			errMsg := make([]string, len(errs))
+			for i, e := range errs {
+				errMsg[i] = e.Error()
+			}
+
+			return errorPkg.NewWithCode(codes.CodeBadRequest, strings.Join(errMsg, ", "))
+		}
+	case "xlam", "xlsm", "xlsx", "xltx", "xltm":
+		f, err := excelize.OpenReader(resp.Body)
+		if err != nil {
+			return errorPkg.NewWithCode(codes.CodeInternalServerError, "failed to read Excel file")
+		}
+
+		sheetName := f.GetSheetName(0)
+		rows, err := f.GetRows(sheetName)
+		if err != nil {
+			return err
+		}
+
+		reports = make([]entity.Report, 0)
+		for _, row := range rows[1:] {
+			if len(row) < 9 {
+				continue
+			}
+
+			quantity, err := strconv.ParseInt(row[4], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			unitPrice, err := strconv.ParseInt(row[5], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			total, err := strconv.ParseInt(row[6], 10, 64)
+			if err != nil {
+				continue
+			}
+
+			report := entity.Report{
+				InvoiceId:     row[0],
+				Date:          row[1],
+				CustomerName:  row[2],
+				Item:          row[3],
+				Quantity:      quantity,
+				UnitPrice:     unitPrice,
+				Total:         total,
+				Status:        row[7],
+				PaymentMethod: row[8],
+			}
+
+			reports = append(reports, report)
+		}
+	default:
+		return errorPkg.NewWithCode(codes.CodeBadRequest, "invalid file extension")
 	}
 
-	reports := make([]entity.Report, 0)
-	errs := reader.Decode(&reports)
-	if len(errs) > 0 {
-		return err
+	if len(reports) == 0 {
+		return errorPkg.NewWithCode(codes.CodeInternalServerError, "no reports found to summarize")
 	}
 
-	salesSummary := s.summarizeSalesSumarries(salesReport.Id, reports)
-	productSummary := s.summarizeProductSummaries(salesReport.Id, reports)
-	dailySalesSummary := s.summarizeDailySales(salesReport.Id, reports)
+	var wg sync.WaitGroup
+	errCh := make(chan error, 3)
+	wg.Add(3)
 
-	err = s.salesSummaryDom.Create(ctx, salesSummary)
-	if err != nil {
-		return err
-	}
+	go func() {
+		defer wg.Done()
+		salesSummary := s.summarizeSalesSummaries(salesReport.Id, reports)
 
-	err = s.productSummaryDom.Create(ctx, productSummary)
-	if err != nil {
-		return err
-	}
+		errCh <- s.salesSummaryDom.Create(ctx, salesSummary)
+	}()
 
-	err = s.dailySalesSummaryDom.Create(ctx, dailySalesSummary)
-	if err != nil {
-		return err
+	go func() {
+		defer wg.Done()
+		productSummary := s.summarizeProductSummaries(salesReport.Id, reports)
+
+		errCh <- s.productSummaryDom.Create(ctx, productSummary)
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		dailySalesSummary := s.summarizeDailySales(salesReport.Id, reports)
+
+		errCh <- s.dailySalesSummaryDom.Create(ctx, dailySalesSummary)
+	}()
+
+	wg.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		if err != nil {
+			err2 := s.salesReportDom.Update(
+				ctx,
+				entity.SalesReportUpdateParam{CompletedAt: null.TimeFrom(time.Now()), ErrorMessage: null.StringFrom(err.Error())},
+				entity.SalesReportParam{FileUrl: salesReport.FileUrl},
+			)
+
+			return err2
+		}
 	}
 
 	err = s.salesReportDom.Update(
 		ctx,
-		entity.SalesReportUpdateParam{StartAt: null.TimeFrom(time.Now())},
+		entity.SalesReportUpdateParam{CompletedAt: null.TimeFrom(time.Now())},
 		entity.SalesReportParam{FileUrl: salesReport.FileUrl},
 	)
 
 	return nil
 }
 
-func (s *salesReport) summarizeSalesSumarries(reportId int64, reports []entity.Report) entity.SalesSummary {
+func (s *salesReport) summarizeSalesSummaries(reportId int64, reports []entity.Report) entity.SalesSummary {
 	var salesSummary entity.SalesSummary
 	var revenue int64
 	mapPaymentMethod := make(map[string]int64)
@@ -384,7 +474,7 @@ func (s *salesReport) summarizeSalesSumarries(reportId int64, reports []entity.R
 }
 
 func (s *salesReport) summarizeProductSummaries(reportId int64, reports []entity.Report) []entity.ProductSummary {
-	var productSumarries []entity.ProductSummary
+	var productSummaries []entity.ProductSummary
 
 	mapProductQuantity := make(map[string]int64)
 	mapProductTotalPrice := make(map[string]int64)
@@ -397,21 +487,21 @@ func (s *salesReport) summarizeProductSummaries(reportId int64, reports []entity
 	}
 
 	for item, quantity := range mapProductQuantity {
-		productSumarry := entity.ProductSummary{
+		productSummary := entity.ProductSummary{
 			ReportId:    reportId,
 			ProductName: item,
 			Quantity:    quantity,
 			Revenue:     mapProductTotalPrice[item],
 		}
 
-		productSumarries = append(productSumarries, productSumarry)
+		productSummaries = append(productSummaries, productSummary)
 	}
 
-	return productSumarries
+	return productSummaries
 }
 
 func (s *salesReport) summarizeDailySales(reportId int64, reports []entity.Report) []entity.DailySalesSummary {
-	var dailSalesSumarries []entity.DailySalesSummary
+	var dailySalesSummaries []entity.DailySalesSummary
 
 	mapDateTransaction := make(map[string]int64)
 	mapDateRevenue := make(map[string]int64)
@@ -425,15 +515,15 @@ func (s *salesReport) summarizeDailySales(reportId int64, reports []entity.Repor
 
 	for dateString, count := range mapDateTransaction {
 		date, _ := time.Parse("2006-01-02", dateString)
-		dailySaleSumarry := entity.DailySalesSummary{
+		dailySaleSummary := entity.DailySalesSummary{
 			ReportId:         reportId,
 			Date:             date,
 			TotalTransaction: count,
 			TotalRevenue:     mapDateRevenue[dateString],
 		}
 
-		dailSalesSumarries = append(dailSalesSumarries, dailySaleSumarry)
+		dailySalesSummaries = append(dailySalesSummaries, dailySaleSummary)
 	}
 
-	return dailSalesSumarries
+	return dailySalesSummaries
 }
