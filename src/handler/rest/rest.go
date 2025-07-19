@@ -134,7 +134,7 @@ func (r *rest) Register() {
 
 	v1.POST("/sales-reports/", r.UploadReport)
 	v1.GET("/sales-reports/", r.GetReportList)
-	v1.GET("/sales-reports/:report_id", r.GetSummarize)
+	v1.GET("/sales-reports/:report_id", r.GetSummary)
 }
 
 func (r *rest) Run() {

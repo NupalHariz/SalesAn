@@ -32,7 +32,7 @@ type Interface interface {
 	UploadReport(ctx context.Context, param dto.UploadReportParam) (string, error)
 	ListReport(ctx context.Context) ([]dto.GetReportList, error)
 	SummarizeReport(ctx context.Context, payload entity.PubSubMessage) error
-	GetSummarizeReport(ctx context.Context, param dto.ReportParam) (dto.SummarizeReport, error)
+	GetSummaryReport(ctx context.Context, param dto.ReportParam) (dto.SummaryReport, error)
 }
 
 type salesReport struct {
@@ -530,8 +530,8 @@ func (s *salesReport) summarizeDailySales(reportId int64, reports []entity.Repor
 	return dailySalesSummaries
 }
 
-func (s *salesReport) GetSummarizeReport(ctx context.Context, param dto.ReportParam) (dto.SummarizeReport, error) {
-	var res dto.SummarizeReport
+func (s *salesReport) GetSummaryReport(ctx context.Context, param dto.ReportParam) (dto.SummaryReport, error) {
+	var res dto.SummaryReport
 
 	salesReport, err := s.salesReportDom.Get(ctx, entity.SalesReportParam{Id: param.ReportId})
 	if err != nil {
@@ -590,7 +590,7 @@ func (s *salesReport) GetSummarizeReport(ctx context.Context, param dto.ReportPa
 		}
 	}
 
-	res = dto.SummarizeReport{
+	res = dto.SummaryReport{
 		SalesSummary:      salesSummary,
 		ProductSummary:    productSummaries,
 		DailySalesSummary: dailySalesSummaries,
