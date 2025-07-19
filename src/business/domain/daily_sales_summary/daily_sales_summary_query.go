@@ -15,4 +15,15 @@ const (
 			:total_revenue	 
 		)
 	`
+
+	readDailySalesSummary = `
+		SELECT
+			id,
+			report_id,
+			date,
+			total_transaction,
+			total_revenue
+		FROM
+		 	daily_sales_summaries
+	`
 )

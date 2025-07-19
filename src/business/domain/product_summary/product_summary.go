@@ -2,6 +2,7 @@ package productsummary
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/NupalHariz/SalesAn/src/business/entity"
 	"github.com/reyhanmichiels/go-pkg/v2/log"
@@ -10,6 +11,7 @@ import (
 
 type Interface interface {
 	Create(ctx context.Context, param []entity.ProductSummary) error
+	GetList(ctx context.Context, param entity.ProductSummaryParam) ([]entity.ProductSummary, error)
 }
 
 type productSummary struct {
@@ -36,4 +38,15 @@ func (p *productSummary) Create(ctx context.Context, param []entity.ProductSumma
 	}
 
 	return nil
+}
+
+func (p *productSummary) GetList(ctx context.Context, param entity.ProductSummaryParam) ([]entity.ProductSummary, error){
+	fmt.Println("\n\n\nPARAM: ", param)
+
+	productSummaries, err := p.getListSQL(ctx, param)
+	if err != nil {
+		return productSummaries, err
+	}
+
+	return productSummaries, nil
 }

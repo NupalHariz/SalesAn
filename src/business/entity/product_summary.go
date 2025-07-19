@@ -7,3 +7,7 @@ type ProductSummary struct {
 	Quantity    int64  `db:"quantity"`
 	Revenue     int64  `db:"revenue"`
 }
+
+type ProductSummaryParam struct {
+	ReportId int64 `db:"report_id" param:"report_id"`
+}

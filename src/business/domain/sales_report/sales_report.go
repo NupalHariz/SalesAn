@@ -12,6 +12,7 @@ type Interface interface {
 	Create(ctx context.Context, param entity.SalesReport) (entity.SalesReport, error)
 	GetList(ctx context.Context) ([]entity.SalesReport, error)
 	Update(ctx context.Context, updateParam entity.SalesReportUpdateParam, saleReportParam entity.SalesReportParam) error
+	Get(ctx context.Context, param entity.SalesReportParam) (entity.SalesReport, error)
 }
 
 type salesReport struct {
@@ -56,4 +57,13 @@ func (s *salesReport) Update(ctx context.Context, updateParam entity.SalesReport
 	}
 
 	return nil
+}
+
+func (s *salesReport) Get(ctx context.Context, param entity.SalesReportParam) (entity.SalesReport, error) {
+	salesReport, err := s.getSQL(ctx, param)
+	if err != nil {
+		return salesReport, err
+	}
+
+	return salesReport, nil
 }

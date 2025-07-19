@@ -33,7 +33,7 @@ func (s *salesReport) getListSQL(ctx context.Context) ([]entity.SalesReport, err
 
 	s.log.Debug(ctx, "get all report list")
 
-	rows, err := s.db.Query(ctx, "raSalesReport", readSalesReportList)
+	rows, err := s.db.Query(ctx, "raSalesReport", readSalesReport)
 	if err != nil {
 		return salesReports, err
 	}
@@ -90,4 +90,31 @@ func (s *salesReport) updateSQL(ctx context.Context, updateParam entity.SalesRep
 	s.log.Debug(ctx, fmt.Sprintf("success to update sales report with param %v and body %v", updateParam, salesReportParam))
 
 	return nil
+}
+
+func (s *salesReport) getSQL(ctx context.Context, param entity.SalesReportParam) (entity.SalesReport, error) {
+	var salesReport entity.SalesReport
+
+	s.log.Debug(ctx, fmt.Sprintf("get sales summary with param %v", param))
+
+	qb := query.NewSQLQueryBuilder(s.db, "param", "db", &query.Option{})
+	queryExt, queryArgs, _, _, err := qb.Build(&param)
+	if err != nil {
+		return salesReport, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	row, err := s.db.QueryRow(ctx, "rSalesReport", readSalesReport+queryExt, queryArgs...)
+	if err != nil {
+		return salesReport, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+	}
+
+	if err := row.StructScan(&salesReport); err != nil && errors.Is(sql.ErrNotFound, err) {
+		return salesReport, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
+	} else if err != nil {
+		return salesReport, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
+	}
+
+	s.log.Debug(ctx, fmt.Sprintf("success to get sales summary with param %v", param))
+
+	return salesReport, nil
 }

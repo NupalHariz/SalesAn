@@ -13,7 +13,7 @@ const (
 		) RETURNING *
 	`
 
-	readSalesReportList = `
+	readSalesReport = `
 		SELECT
 			id,
 			file_url,

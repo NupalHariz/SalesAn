@@ -20,4 +20,16 @@ const (
 			:most_payment_method
 		)
 	`
+	readSalesSummary = `
+		SELECT
+			id,
+			report_id,
+			total_transaction,
+			success,
+			failed,
+			total_revenue,
+			most_payment_method
+		FROM
+			sales_summaries
+	`
 )

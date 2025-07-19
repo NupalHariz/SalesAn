@@ -16,6 +16,7 @@ type SalesReport struct {
 }
 
 type SalesReportParam struct {
+	Id      int64  `db:"id"`
 	FileUrl string `db:"file_url"`
 }
 
