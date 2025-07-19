@@ -9,3 +9,7 @@ type DailySalesSummary struct {
 	TotalTransaction int64     `db:"total_transaction"`
 	TotalRevenue     int64     `db:"total_revenue"`
 }
+
+type DailySalesSummaryParam struct {
+	ReportId int64 `db:"report_id" param:"report_id"`
+}

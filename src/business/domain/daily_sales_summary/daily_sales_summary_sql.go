@@ -7,6 +7,7 @@ import (
 	"github.com/NupalHariz/SalesAn/src/business/entity"
 	"github.com/reyhanmichiels/go-pkg/v2/codes"
 	"github.com/reyhanmichiels/go-pkg/v2/errors"
+	"github.com/reyhanmichiels/go-pkg/v2/query"
 	"github.com/reyhanmichiels/go-pkg/v2/sql"
 )
 
@@ -39,3 +40,35 @@ func (d *dailySalesSummary) createSQL(ctx context.Context, param []entity.DailyS
 
 	return nil
 }
+
+func (p *dailySalesSummary) getListSQL(ctx context.Context, param entity.DailySalesSummaryParam) ([]entity.DailySalesSummary, error) {
+	var dailySalesSummaries []entity.DailySalesSummary
+
+	p.log.Debug(ctx, fmt.Sprintf("read daily sales summary list with param %v", param))
+
+	qb := query.NewSQLQueryBuilder(p.db, "param", "db", &query.Option{})
+	queryExt, queryArgs, _, _, err := qb.Build(&param)
+	if err != nil {
+		return dailySalesSummaries, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	rows, err := p.db.Query(ctx, "raProductSummary", readDailySalesSummary+queryExt, queryArgs...)
+	if err != nil {
+		return dailySalesSummaries, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next(){
+		var dailySalesSummary entity.DailySalesSummary
+		err := rows.StructScan(&dailySalesSummary)
+		if err != nil {
+			p.log.Error(ctx, errors.NewWithCode(codes.CodeSQLRowScan, err.Error()))
+			continue
+		}
+
+		dailySalesSummaries = append(dailySalesSummaries, dailySalesSummary)
+	}
+
+	return dailySalesSummaries, nil
+}
+

@@ -10,6 +10,7 @@ import (
 
 type Interface interface {
 	Create(ctx context.Context, param []entity.DailySalesSummary) error
+	GetList(ctx context.Context, param entity.DailySalesSummaryParam) ([]entity.DailySalesSummary, error)
 }
 
 type dailySalesSummary struct {
@@ -36,4 +37,13 @@ func (d *dailySalesSummary) Create(ctx context.Context, param []entity.DailySale
 	}
 
 	return nil
+}
+
+func (d *dailySalesSummary) GetList(ctx context.Context, param entity.DailySalesSummaryParam) ([]entity.DailySalesSummary, error) {
+	productSummaries, err := d.getListSQL(ctx, param)
+	if err != nil {
+		return productSummaries, err
+	}
+
+	return productSummaries, nil
 }

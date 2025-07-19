@@ -15,4 +15,15 @@ const (
 			:revenue	 
 		)
 	`
+
+	readProductSummary = `
+		SELECT
+			id,
+			report_id,
+			product_name,
+			quantity,
+			revenue
+		FROM
+		 	product_summaries
+	`
 )

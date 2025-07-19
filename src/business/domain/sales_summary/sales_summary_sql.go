@@ -7,6 +7,7 @@ import (
 	"github.com/NupalHariz/SalesAn/src/business/entity"
 	"github.com/reyhanmichiels/go-pkg/v2/codes"
 	"github.com/reyhanmichiels/go-pkg/v2/errors"
+	"github.com/reyhanmichiels/go-pkg/v2/query"
 	"github.com/reyhanmichiels/go-pkg/v2/sql"
 )
 
@@ -38,4 +39,31 @@ func (s *salesSummary) createSQL(ctx context.Context, param entity.SalesSummary)
 	s.log.Info(ctx, fmt.Sprintf("success to create sales summary with param: %v", param))
 
 	return nil
+}
+
+func (s *salesSummary) getSQL(ctx context.Context, param entity.SalesSummaryParam) (entity.SalesSummary, error) {
+	var salesSummary entity.SalesSummary
+
+	s.log.Debug(ctx, fmt.Sprintf("get sales summary with param %v", param))
+
+	qb := query.NewSQLQueryBuilder(s.db, "param", "db", &query.Option{})
+	queryExt, queryArgs, _, _, err := qb.Build(&param)
+	if err != nil {
+		return salesSummary, errors.NewWithCode(codes.CodeSQLBuilder, err.Error())
+	}
+
+	row, err := s.db.QueryRow(ctx, "rSalesSummary", readSalesSummary+queryExt, queryArgs...)
+	if err != nil {
+		return salesSummary, errors.NewWithCode(codes.CodeSQLRead, err.Error())
+	}
+
+	if err := row.StructScan(&salesSummary); err != nil && errors.Is(sql.ErrNotFound, err) {
+		return salesSummary, errors.NewWithCode(codes.CodeSQLRecordDoesNotExist, err.Error())
+	} else if err != nil {
+		return salesSummary, errors.NewWithCode(codes.CodeSQLRowScan, err.Error())
+	}
+
+	s.log.Debug(ctx, fmt.Sprintf("success to get sales summary with param %v", param))
+
+	return salesSummary, nil
 }

@@ -9,3 +9,7 @@ type SalesSummary struct {
 	TotalRevenue      int64  `db:"total_revenue"`
 	MostPaymentMethod string `db:"most_payment_method"`
 }
+
+type SalesSummaryParam struct {
+	ReportId int64 `db:"report_id" param:"report_id"`
+}

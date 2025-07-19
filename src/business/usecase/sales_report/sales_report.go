@@ -32,6 +32,7 @@ type Interface interface {
 	UploadReport(ctx context.Context, param dto.UploadReportParam) (string, error)
 	ListReport(ctx context.Context) ([]dto.GetReportList, error)
 	SummarizeReport(ctx context.Context, payload entity.PubSubMessage) error
+	GetSummaryReport(ctx context.Context, param dto.ReportParam) (dto.SummaryReport, error)
 }
 
 type salesReport struct {
@@ -68,6 +69,13 @@ func Init(param InitParam) Interface {
 		json:                 param.Json,
 	}
 }
+
+const (
+	SUCCESS    = "Success"
+	FAILED     = "Failed"
+	WAITING    = "Waiting"
+	PROCESSING = "Processing"
+)
 
 func (s *salesReport) UploadReport(ctx context.Context, param dto.UploadReportParam) (string, error) {
 	userLogin, err := s.auth.GetUserAuthInfo(ctx)
@@ -259,23 +267,15 @@ func (s *salesReport) ListReport(ctx context.Context) ([]dto.GetReportList, erro
 		return res, err
 	}
 
-	for _, s := range salesReports {
+	for _, sr := range salesReports {
 		var salesReport dto.GetReportList
 		var status string
 
-		if s.StartAt.IsNullOrZero() {
-			status = "Waiting"
-		} else if !s.StartAt.IsNullOrZero() && s.CompletedAt.IsNullOrZero() {
-			status = "Processing"
-		} else if !s.CompletedAt.IsNullOrZero() && !s.ErrorMessage.IsNullOrZero() {
-			status = "Failed"
-		} else {
-			status = "Success"
-		}
+		status = s.getStatus(sr)
 
 		salesReport = dto.GetReportList{
-			Id:      s.Id,
-			FileUrl: s.FileUrl,
+			Id:      sr.Id,
+			FileUrl: sr.FileUrl,
 			Status:  status,
 		}
 
@@ -528,4 +528,89 @@ func (s *salesReport) summarizeDailySales(reportId int64, reports []entity.Repor
 	}
 
 	return dailySalesSummaries
+}
+
+func (s *salesReport) GetSummaryReport(ctx context.Context, param dto.ReportParam) (dto.SummaryReport, error) {
+	var res dto.SummaryReport
+
+	salesReport, err := s.salesReportDom.Get(ctx, entity.SalesReportParam{Id: param.ReportId})
+	if err != nil {
+		return res, err
+	}
+
+	status := s.getStatus(salesReport)
+
+	if status == PROCESSING || status == WAITING {
+		return res, errorPkg.NewWithCode(codes.CodeBadRequest, "report is not complete yet")
+	} else if status == FAILED {
+		res.ErrorMessage = salesReport.ErrorMessage.String
+
+		return res, nil
+	}
+
+	var wg sync.WaitGroup
+	var salesSummary entity.SalesSummary
+	var productSummaries []entity.ProductSummary
+	var dailySalesSummaries []entity.DailySalesSummary
+
+	errCh := make(chan error, 3)
+
+	wg.Add(3)
+
+	go func() {
+		defer wg.Done()
+		var err error
+
+		salesSummary, err = s.salesSummaryDom.Get(ctx, entity.SalesSummaryParam{ReportId: param.ReportId})
+		errCh <- err
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+
+		productSummaries, err = s.productSummaryDom.GetList(ctx, entity.ProductSummaryParam{ReportId: param.ReportId})
+		errCh <- err
+	}()
+
+	go func() {
+		defer wg.Done()
+		var err error
+
+		dailySalesSummaries, err = s.dailySalesSummaryDom.GetList(ctx, entity.DailySalesSummaryParam{ReportId: param.ReportId})
+		errCh <- err
+	}()
+
+	wg.Wait()
+	close(errCh)
+
+	for e := range errCh {
+		if e != nil {
+			return res, e
+		}
+	}
+
+	res = dto.SummaryReport{
+		SalesSummary:      salesSummary,
+		ProductSummary:    productSummaries,
+		DailySalesSummary: dailySalesSummaries,
+	}
+
+	return res, nil
+}
+
+func (s *salesReport) getStatus(salesReport entity.SalesReport) string {
+	var status string
+
+	if salesReport.StartAt.IsNullOrZero() {
+		status = WAITING
+	} else if !salesReport.StartAt.IsNullOrZero() && salesReport.CompletedAt.IsNullOrZero() {
+		status = PROCESSING
+	} else if !salesReport.CompletedAt.IsNullOrZero() && !salesReport.ErrorMessage.IsNullOrZero() {
+		status = FAILED
+	} else {
+		status = SUCCESS
+	}
+
+	return status
 }

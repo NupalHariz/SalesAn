@@ -32,3 +32,20 @@ func (r *rest) GetReportList(ctx *gin.Context) {
 
 	r.httpRespSuccess(ctx, codes.CodeSuccess, data, nil)
 }
+
+func (r *rest) GetSummary(ctx *gin.Context) {
+	var param dto.ReportParam
+	err := r.BindUri(ctx, &param)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	res, err := r.uc.SalesReport.GetSummaryReport(ctx.Request.Context(), param)
+	if err != nil {
+		r.httpRespError(ctx, err)
+		return
+	}
+
+	r.httpRespSuccess(ctx, codes.CodeSuccess, res, nil)
+}
