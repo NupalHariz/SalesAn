@@ -14,9 +14,4 @@ var setUpQueues = []setUpQueue{
 		RoutingKey:   entity.KeySalesReport,
 		ExchangeName: entity.ExchangeSalesReport,
 	},
-	{
-		QueueName:    entity.QueueHi,
-		RoutingKey:   entity.KeyHi,
-		ExchangeName: entity.ExchangeSalesReport,
-	},
 }

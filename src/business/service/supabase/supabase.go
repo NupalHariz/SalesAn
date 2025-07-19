@@ -33,7 +33,3 @@ func (s *supabase) Upload(file *multipart.FileHeader) (string, error) {
 
 	return url, err
 }
-
-func (s *supabase) Get(url string) {
-	
-}

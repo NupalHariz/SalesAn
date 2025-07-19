@@ -14,7 +14,7 @@ import (
 )
 
 type Interface interface {
-	Publish(ctx context.Context, exchaneName string, routingKey string, data interface{}) error
+	Publish(ctx context.Context, exchangeName string, routingKey string, data interface{}) error
 }
 
 type publisher struct {
@@ -84,7 +84,7 @@ func (p *publisher) Publish(ctx context.Context, exchangeName string, routingKey
 
 	jsonData, err := p.json.Marshal(data)
 	if err != nil {
-		p.log.Error(ctx, fmt.Sprintf("error unmarshal: %v", err))
+		p.log.Error(ctx, fmt.Sprintf("error marshal: %v", err))
 		return err
 	}
 
@@ -95,7 +95,7 @@ func (p *publisher) Publish(ctx context.Context, exchangeName string, routingKey
 
 	payload, err := p.json.Marshal(pubsubMsg)
 	if err != nil {
-		p.log.Error(ctx, fmt.Sprintf("error unmarshal: %v", err))
+		p.log.Error(ctx, fmt.Sprintf("error marshal: %v", err))
 		return err
 	}
 
