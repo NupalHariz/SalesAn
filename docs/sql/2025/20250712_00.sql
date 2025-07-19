@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS sales_reports;
 
 CREATE TABLE IF NOT EXISTS sales_reports(
     id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
     file_url VARCHAR(255) NOT NULL,
     start_at TIMESTAMP,
     completed_at TIMESTAMP,

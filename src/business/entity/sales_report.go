@@ -8,7 +8,6 @@ type Status string
 
 type SalesReport struct {
 	Id           int64       `db:"id"`
-	UserId       int64       `db:"user_id"`
 	FileUrl      string      `db:"file_url"`
 	ErrorMessage null.String `db:"error_message"`
 	StartAt      null.Time   `db:"start_at"`
