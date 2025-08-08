@@ -1,9 +1,17 @@
 # SalesAn
 
-SalesAn is an service to summarize an sales report file. SalesAn support common file like csv, xslx, and etc.
+SalesAn is a service to analyze and summarize a sales report in form of csv, xslx, and etc. This tools will summarize the report into 3 things:
+1. Overall Summary
 
-This is a fun project i used to learn about asynchronous programming and RabbitMQ
+   This summary will summarize total transaction in the exceel. How much success and failed transaction, total revenue, and most used payment methods.  
+2. Product Summary
 
+   This summary will summarize all product that has been sold. It will show total revenue and total product that has been sold.  
+3. Daily Sales Summary
+
+   This summary will tell us about every revenue in a day and total number of transaction that happens in that day.  
+
+This is a fun project, i’m trying to build a software that can run asynchronously with message broker.
 ## Features
 
 ### Sales Report
